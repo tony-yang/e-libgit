@@ -4,8 +4,20 @@ logger = logging.getLogger(__name__)
 import os
 
 class Objects:
-    def __init__(self, repo_name):
+    def __init__(self):
         logger.info('Create the Objects object')
         self.pwd = os.getcwd()
-        objects_dir = os.path.join(self.pwd, repo_name, '.git', 'objects')
+
+    def create_objects_dir(self, repo_name, bare_repo=False):
+        '''Create the objects directory for holding the git objects
+
+        Keyword arguments:
+        repo_name -- the name of the repository
+        bare_repo -- specify if this is a bare repo (default False)
+        '''
+        if not bare_repo:
+            objects_dir = os.path.join(self.pwd, repo_name, '.git', 'objects')
+        else:
+            objects_dir = os.path.join(self.pwd, repo_name, 'objects')
+
         os.makedirs(objects_dir, mode=0o644)

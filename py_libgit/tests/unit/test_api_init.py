@@ -1,4 +1,5 @@
 import unittest
+
 import os, shutil
 from py_libgit.api.init import Init
 from py_libgit.core.exceptions import FileNamingConventionError
@@ -41,3 +42,20 @@ class TestInit(unittest.TestCase):
         with self.assertRaises(FileNamingConventionError, msg='Using special characters in repo name should not be allowed. Only allowing [a-zA-Z0-9_.-] for repo name'):
             git_init = Init(repo_name)
             git_init.create_git_repo()
+
+    def test_create_git_bare_repo(self):
+        self.init.create_git_repo(bare_repo=True)
+        pwd = os.getcwd()
+
+        objects_path = os.path.join(pwd, self.repo_name, 'objects')
+        objects_dir = os.path.exists(objects_path)
+
+        refs_path = os.path.join(pwd, self.repo_name, 'refs', 'heads')
+        refs_dir = os.path.exists(refs_path)
+
+        HEAD_path = os.path.join(pwd, self.repo_name, 'HEAD')
+        HEAD_file = os.path.exists(HEAD_path)
+
+        self.assertTrue(objects_dir, 'Failed to create the objects directory')
+        self.assertTrue(refs_dir, 'Failed to create the refs/heads directory')
+        self.assertTrue(HEAD_file, 'Failed to create the HEAD reference file')
