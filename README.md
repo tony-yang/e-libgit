@@ -10,7 +10,13 @@ I was interested in the underlying implementation of git and its distributed nat
 - How to distribute the git server and make it even more scalable and highly available so that it could handle very large load (or perhaps misused load such as committing large binary objects)? Does it hold any merit to use distributed hashing strategy over the current cluster mirror strategy (both active-active or active-slave disk RAID/DRBD) or DGit?
 
 ## Dev Guide
+### Python version
 After repo checkout, the Python git is under the `py_libgit` directory. The Ruby git is under the `ruby_libgit`. Each version has its own Makefile and setup. There is a master Makefile that builds the container and runs the tests from each directory. After change just run `make` from the top level directory.
+
+### Ruby version
+After repo checkout, the Ruby git is under the `ruby_libgit` directory. Similarly, just run `make` to build a new docker environment and run test. It will also install the gem locally.
+
+To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Just a Self Reminder
 Use libgit2 if you are serious about implementing some kind of real or toy application based on git core :p

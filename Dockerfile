@@ -6,7 +6,19 @@ RUN pip3 install --upgrade \
     pip \
     setuptools
 
+RUN gem install \
+    bundler \
+    json \
+    rake \
+    rubocop \
+    rspec \
+    simplecov
+
 ADD . /root/
 
-RUN mkdir /var/log/py_libgit
-RUN pip install -e /root/py_libgit/.
+RUN mkdir /var/log/py_libgit && mkdir /var/log/ruby_libgit
+
+RUN pip install -e /root/py_libgit/. \
+ && cd /root/ruby_libgit \
+ && bin/setup \
+ && rake install
