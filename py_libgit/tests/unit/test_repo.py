@@ -1,12 +1,9 @@
 import unittest
-from unittest.mock import MagicMock
-
-import logging.config
-mockLoggingConfig = logging.config.fileConfig('logging_test.conf')
-logging.config.fileConfig = MagicMock(return_value=mockLoggingConfig)
-
 from py_libgit.core.repo import Repo
 from py_libgit.core.exceptions import FileNamingConventionError
+
+# Make sure this is after all other import to override the logger setting
+import py_libgit.settings_tests
 
 class TestRepo(unittest.TestCase):
     def test_good_repo_name_should_return_true(self):

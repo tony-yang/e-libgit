@@ -8,5 +8,5 @@ RUN pip3 install --upgrade \
 
 ADD . /root/
 
-RUN mkdir /var/log/libgit
+RUN mkdir /var/log/py_libgit
 RUN pip install -e /root/py_libgit/.

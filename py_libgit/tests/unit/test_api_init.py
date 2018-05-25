@@ -1,13 +1,10 @@
 import unittest
-from unittest.mock import MagicMock
-
-import logging.config
-mockLoggingConfig = logging.config.fileConfig('logging_test.conf')
-logging.config.fileConfig = MagicMock(return_value=mockLoggingConfig)
-
 import os, shutil
 from py_libgit.api.init import Init
 from py_libgit.core.exceptions import FileNamingConventionError
+
+# Make sure this is after all other import to override the logger setting
+import py_libgit.settings_tests
 
 class TestInit(unittest.TestCase):
     def setUp(self):

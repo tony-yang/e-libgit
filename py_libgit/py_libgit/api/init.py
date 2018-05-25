@@ -1,6 +1,5 @@
-import logging, logging.config
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('libgit')
+import logging, py_libgit.settings
+logger = logging.getLogger(__name__)
 
 from py_libgit.core.head_ref import HeadRef
 from py_libgit.core.objects import Objects

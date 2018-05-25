@@ -1,6 +1,5 @@
-import logging, logging.config
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('libgit')
+import logging, py_libgit.settings
+logger = logging.getLogger(__name__)
 
 import os, re
 from py_libgit.core.exceptions import FileNamingConventionError
