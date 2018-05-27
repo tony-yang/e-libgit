@@ -27,6 +27,11 @@ class Repo:
 
         return True
 
+    def repo_exist(self, repo_name):
+        if os.path.exists(os.path.join(self.pwd, repo_name)):
+            raise FileExistsError('The git repository {} already exists!'.format(repo_name))
+        return False
+
     def create_repo(self, repo_name, bare_repo=False):
         '''Create a new repo
 
@@ -35,6 +40,7 @@ class Repo:
         bare_repo -- specify if this is a bare repo (default False)
         '''
         self.verify_naming_convention(repo_name)
+        self.repo_exist(repo_name)
 
         if not bare_repo:
             git_repo = os.path.join(self.pwd, repo_name, '.git')
