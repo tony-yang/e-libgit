@@ -13,4 +13,10 @@ describe RubyLibgit::Repo do
     repo_name = 'hello-git*'
     expect{ repo.send :correct_naming_convention?, repo_name }.to raise_error(RubyLibgit::FileNamingConventionError)
   end
+
+  it 'raises exception with duplicate repo name' do
+    repo_name = 'hello-git'
+    allow(::Dir).to receive(:exist?) { true }
+    expect{ repo.send :repo_exist?, repo_name }.to raise_error(RubyLibgit::RepositoryExistError)
+  end
 end

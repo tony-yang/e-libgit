@@ -5,4 +5,11 @@ module RubyLibgit
       super
     end
   end
+
+  # Repository Exist Exception Exception
+  class RepositoryExistError < StandardError
+    def initialize(msg = 'The git repository already exists!')
+      super
+    end
+  end
 end

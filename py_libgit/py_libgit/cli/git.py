@@ -14,12 +14,11 @@ def main():
     init_parser.add_argument('repo_name', help='New repository name. Should only use letters, digits, _, ., and - in the name')
     init_parser.add_argument('--bare', action='store_true', help='Create a bare repository')
     args = parser.parse_args()
-    print(args)
 
     if 'repo_name' in args:
         logger.info('Called with init repo_name {}'.format(args.repo_name))
-        init = Init(args.repo_name)
-        init.create_git_repo(args.bare)
+        init = Init()
+        init.create_git_repo(args.repo_name, args.bare)
     else:
         parser.print_help()
 

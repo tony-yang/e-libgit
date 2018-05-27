@@ -15,10 +15,10 @@ class HeadRef:
         repo_name -- the name of the repository
         bare_repo -- specify if this is a bare repo (default False)
         '''
-        if not bare_repo:
-            head_file = os.path.join(self.pwd, repo_name, '.git', 'HEAD')
-        else:
+        if bare_repo:
             head_file = os.path.join(self.pwd, repo_name, 'HEAD')
+        else:
+            head_file = os.path.join(self.pwd, repo_name, '.git', 'HEAD')
 
         with open(head_file, 'w') as f:
             f.write('ref: refs/heads/master')

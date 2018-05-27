@@ -1,16 +1,25 @@
 require 'ruby_libgit'
 
 module RubyLibgit
-  # API
+  # The Git init API class
   class Init
-    def initialize(repo_name)
+    def initialize
       RubyLibgit::Logging.logger.info('Create the Init object')
-      @repo_name = repo_name
     end
 
-    def create_git_repo
+    # Create a new git repository
+    # Params:
+    # - repo_name: the name of the repository
+    # - bare_repo: specify if this is a bare repo (default false)
+    def create_git_repo(repo_name, bare_repo = false)
+      @repo_name = repo_name
       @repo = RubyLibgit::Repo.new
-      @repo.create_repo(@repo_name)
+      begin
+        @repo.create_repo(@repo_name, bare_repo)
+      rescue RubyLibgit::RepositoryExistError => error
+        RubyLibgit::Logging.logger.info(error)
+        warn error
+      end
     end
   end
 end

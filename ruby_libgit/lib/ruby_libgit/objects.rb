@@ -9,8 +9,13 @@ module RubyLibgit
       @pwd = ::Dir.pwd
     end
 
-    def create_objects_dir(repo_name)
-      objects_dir = ::File.join(@pwd, repo_name, '.git', 'objects')
+    def create_objects_dir(repo_name, bare_repo = false)
+      objects_dir = if bare_repo
+                      ::File.join(@pwd, repo_name, 'objects')
+                    else
+                      ::File.join(@pwd, repo_name, '.git', 'objects')
+                    end
+
       FileUtils.mkdir_p(objects_dir, mode: 0o644)
     end
   end

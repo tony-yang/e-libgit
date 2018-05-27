@@ -15,9 +15,9 @@ class Objects:
         repo_name -- the name of the repository
         bare_repo -- specify if this is a bare repo (default False)
         '''
-        if not bare_repo:
-            objects_dir = os.path.join(self.pwd, repo_name, '.git', 'objects')
-        else:
+        if bare_repo:
             objects_dir = os.path.join(self.pwd, repo_name, 'objects')
+        else:
+            objects_dir = os.path.join(self.pwd, repo_name, '.git', 'objects')
 
         os.makedirs(objects_dir, mode=0o644)

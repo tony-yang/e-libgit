@@ -10,13 +10,13 @@ import py_libgit.settings_tests
 class TestInit(unittest.TestCase):
     def setUp(self):
         self.repo_name = 'hellogit-testrepo'
-        self.init = Init(self.repo_name)
+        self.init = Init()
 
     def tearDown(self):
         shutil.rmtree(self.repo_name, ignore_errors=True)
 
     def test_create_git_repo(self):
-        self.init.create_git_repo()
+        self.init.create_git_repo(self.repo_name)
         pwd = os.getcwd()
 
         repo_path = os.path.join(pwd, self.repo_name, '.git')
@@ -40,11 +40,11 @@ class TestInit(unittest.TestCase):
         repo_name = 'hellogit*'
 
         with self.assertRaises(FileNamingConventionError, msg='Using special characters in repo name should not be allowed. Only allowing [a-zA-Z0-9_.-] for repo name'):
-            git_init = Init(repo_name)
-            git_init.create_git_repo()
+            git_init = Init()
+            git_init.create_git_repo(repo_name)
 
     def test_create_git_bare_repo(self):
-        self.init.create_git_repo(bare_repo=True)
+        self.init.create_git_repo(self.repo_name, bare_repo=True)
         pwd = os.getcwd()
 
         objects_path = os.path.join(pwd, self.repo_name, 'objects')

@@ -15,29 +15,38 @@ module RubyLibgit
 
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
     def parse(args = ARGV)
-      options = {}
+      options = {
+        init: { bare: false }
+      }
 
       subcommands = {
         init: OptionParser.new do |o|
           o.banner = 'usage: git init <repo_name> [<args>] - Create an empty Git repository'
-          options[:init] = {}
+          o.on('--[no-]bare', 'Create a bare repository') do |b|
+            options[:init][:bare] = b
+          end
         end
       }
 
       parser = OptionParser.new do |o|
         o.banner = "usage: git <command> [<args>]\n\n"
         subcommands.each do |subcommand, subparser|
-          o.banner += "Command\n\t" + subcommand.to_s
+          o.banner += "Command\n" + subcommand.to_s
           o.banner += "\t\t" + subparser.help
         end
-
+        o.banner += "\n\nNeed help?\n"
         o.on_tail('-h', '--help', 'List available subcommands and some concept guides.') do
           puts o
           exit
         end
       end
 
-      if args[0] && subcommands.key?(args[0].to_sym)
+      if args.empty? || !(args[0].start_with?('-') || options.key?(args[0].to_sym))
+        puts parser.help
+        exit
+      end
+
+      if subcommands.key?(args[0].to_sym)
         subcommand = args.shift.to_sym
         if args.empty?
           puts subcommands[subcommand].help
@@ -53,9 +62,6 @@ module RubyLibgit
             exit 1
           end
         end
-      elsif args.empty?
-        puts parser.help
-        exit
       else
         begin
           parser.parse!(args)
@@ -72,8 +78,8 @@ module RubyLibgit
     def run
       if @options.key?(:init)
         RubyLibgit::Logging.logger.info('Called with init repo_name ' + @options[:init][:non_option_arg])
-        init = RubyLibgit::Init.new(@options[:init][:non_option_arg])
-        init.create_git_repo
+        init = RubyLibgit::Init.new
+        init.create_git_repo(@options[:init][:non_option_arg], @options[:init][:bare])
       end
     end
   end

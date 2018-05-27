@@ -16,24 +16,30 @@ class Repo:
         self.head_ref = HeadRef()
 
     def verify_naming_convention(self, repo_name):
+        '''Verify if the repository name follows convention. File name should only contain letters, digits, _, ., and -
+
+        Keyword arguments:
+        repo_name -- the name of the repository
+        '''
         name_regex = re.compile(r'[^a-zA-Z0-9_.-]')
         if bool(name_regex.search(repo_name)):
             raise FileNamingConventionError(repo_name, 'File name should only contain letters, digits, _, ., and -')
 
         return True
 
-    def create_repo(self, repo_name):
-        self.verify_naming_convention(repo_name)
-        git_repo = os.path.join(self.pwd, repo_name, '.git')
-        os.makedirs(git_repo, mode=0o644)
+    def create_repo(self, repo_name, bare_repo=False):
+        '''Create a new repo
 
-        self.objects.create_objects_dir(repo_name)
-        self.refs.create_refs_dir(repo_name)
-        self.head_ref.create_head_ref_file(repo_name)
-
-    def create_bare_repo(self, repo_name):
+        Keyword arguments:
+        repo_name -- the name of the repository
+        bare_repo -- specify if this is a bare repo (default False)
+        '''
         self.verify_naming_convention(repo_name)
 
-        self.objects.create_objects_dir(repo_name, bare_repo=True)
-        self.refs.create_refs_dir(repo_name, bare_repo=True)
-        self.head_ref.create_head_ref_file(repo_name, bare_repo=True)
+        if not bare_repo:
+            git_repo = os.path.join(self.pwd, repo_name, '.git')
+            os.makedirs(git_repo, mode=0o644)
+
+        self.objects.create_objects_dir(repo_name, bare_repo)
+        self.refs.create_refs_dir(repo_name, bare_repo)
+        self.head_ref.create_head_ref_file(repo_name, bare_repo)

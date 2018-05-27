@@ -15,9 +15,9 @@ class Refs:
         repo_name -- the name of the repository
         bare_repo -- specify if this is a bare repo (default False)
         '''
-        if not bare_repo:
-            refs_dir = os.path.join(self.pwd, repo_name, '.git', 'refs', 'heads')
-        else:
+        if bare_repo:
             refs_dir = os.path.join(self.pwd, repo_name, 'refs', 'heads')
+        else:
+            refs_dir = os.path.join(self.pwd, repo_name, '.git', 'refs', 'heads')
 
         os.makedirs(refs_dir, mode=0o644)
