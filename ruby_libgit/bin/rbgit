@@ -4,7 +4,6 @@ require_relative '../lib/ruby_libgit/git'
 
 begin
   cli = RubyLibgit::Git.instance
-  cli.parse
   cli.run
 rescue => e
   raise e if $DEBUG
