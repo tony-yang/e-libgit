@@ -5,7 +5,7 @@ import os
 
 class HeadRef:
     def __init__(self):
-        logger.info('Create a new Repo')
+        logger.info('Create a new HEAD Ref')
         self.pwd = os.getcwd()
 
     def create_head_ref_file(self, repo_name, bare_repo=False):

@@ -5,7 +5,7 @@ import os
 
 class Objects:
     def __init__(self):
-        logger.info('Create the Objects object')
+        logger.info('Create an Objects object')
         self.pwd = os.getcwd()
 
     def create_objects_dir(self, repo_name, bare_repo=False):

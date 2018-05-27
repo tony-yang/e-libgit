@@ -20,5 +20,4 @@ RUN mkdir /var/log/py_libgit && mkdir /var/log/ruby_libgit
 
 RUN pip install -e /root/py_libgit/. \
  && cd /root/ruby_libgit \
- && bin/setup \
  && rake install

@@ -5,7 +5,7 @@ import os
 
 class Refs:
     def __init__(self):
-        logger.info('Create the Refs object')
+        logger.info('Create a Refs object')
         self.pwd = os.getcwd()
 
     def create_refs_dir(self, repo_name, bare_repo=False):
