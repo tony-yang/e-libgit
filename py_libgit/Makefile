@@ -1,5 +1,3 @@
-unittest:
-	coverage run --omit=./tests/* -m unittest discover -s tests/unit -v
+test:
+	coverage run -m unittest discover -s tests -v
 	coverage report -m --include=./*
-
-test: unittest

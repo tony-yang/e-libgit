@@ -6,12 +6,13 @@ from py_libgit.core.head_ref import HeadRef
 from py_libgit.core.objects import Objects
 from py_libgit.core.refs import Refs
 from py_libgit.core.exceptions import FileNamingConventionError
+from py_libgit.core.exceptions import NotGitRepoError
 
 class Repo:
     def __init__(self):
         logger.info('Create a new Repo')
         self.pwd = os.getcwd()
-        self.objects = Objects()
+        self.objects = Objects(self)
         self.refs = Refs()
         self.head_ref = HeadRef()
 
@@ -49,3 +50,11 @@ class Repo:
         self.objects.create_objects_dir(repo_name, bare_repo)
         self.refs.create_refs_dir(repo_name, bare_repo)
         self.head_ref.create_head_ref_file(repo_name, bare_repo)
+
+    def get_repo_root(self, current_dir):
+        while not os.path.exists(os.path.join(current_dir, '.git')):
+            current_dir = os.path.dirname(current_dir)
+            if '/' == current_dir:
+                raise NotGitRepoError(current_dir, 'Not a git repository. Please run `git init` at the top-most level of this project')
+        current_dir = os.path.join(current_dir, '.git')
+        return current_dir
