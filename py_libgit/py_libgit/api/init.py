@@ -20,4 +20,3 @@ class Init:
             self.repo.create_repo(self.repo_name, bare_repo)
         except FileExistsError:
             logger.warning('The git repository {} already exists!'.format(self.repo_name))
-            print('The git repository {} already exists!'.format(self.repo_name))

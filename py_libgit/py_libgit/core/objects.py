@@ -10,14 +10,6 @@ class Objects:
         self.pwd = os.getcwd()
         self.repo = repo
 
-    def get_git_root(self, current_dir):
-        while not os.path.exists(os.path.join(current_dir, '..', '.git')):
-            current_dir = os.path.dirname(current_dir)
-            if '/' == current_dir:
-                raise NotGitRepoError(current_dir, 'Not a git repository. Please run `git init` at the top-most level of this project')
-        current_dir = os.path.join(current_dir, '.git')
-        return current_dir
-
     def create_objects_dir(self, repo_name, bare_repo=False):
         '''Create the objects directory for holding the git objects
 
