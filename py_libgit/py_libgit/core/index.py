@@ -4,20 +4,28 @@ logger = logging.getLogger(__name__)
 import os
 
 class Index:
-    def __init__(self):
+    def __init__(self, repo):
         logger.info('Create an Index object')
-        git_root = self.get_git_root(os.getcwd())
-        self.index_file = os.path.join(git_root, 'index')
+        self.repo = repo
+        self.git_root = self.repo.get_repo_root(os.getcwd())
+        self.index_file = os.path.join(self.git_root, 'index')
 
-    def get_git_root(self, current_dir=os.getcwd()):
-        while not os.path.exists(os.path.join(current_dir, '..', '.git')):
-            current_dir = os.path.dirname(current_dir)
-            if '/' == current_dir:
-                raise NotGitRepoError(current_dir, 'Not a git repository. Please run `git init` at the top-most level of this project')
-
-        return current_dir
+    def build_tracked_index(self):
+        tracked_index = {}
+        with open(self.index_file, 'r') as files:
+            for file in files:
+                tracked_index[file.strip()] = True
+        return tracked_index
 
     def update_index(self, pathname):
-        index_file = os.path.join(self.get_git_root(), pathname)
-        with open(index_file, 'a') as f:
-            f.write(pathname)
+        tracked_index = {}
+        if os.path.exists(self.index_file):
+            tracked_index = self.build_tracked_index()
+
+        if pathname not in tracked_index:
+            with open(self.index_file, 'a') as f:
+                f.write('{}\n'.format(pathname))
+
+            return True
+
+        return False

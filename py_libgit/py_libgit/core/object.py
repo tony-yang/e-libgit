@@ -17,8 +17,8 @@ class Object:
         logger.info('hash of content = {}'.format(content_hash))
         return content_hash
 
-    def track_pathname_in_index_if_not_exists(self, pathname):
-        index = Index()
+    def track_pathname_in_index(self, pathname):
+        index = Index(self.repo)
         index.update_index(pathname)
 
     def store_blob(self, content_hash, content):
@@ -42,15 +42,17 @@ class Object:
                 content = f.read()
                 content_hash = self.create_hash(content)
                 self.store_blob(content_hash, content)
-                self.track_pathname_in_index_if_not_exists(pathname)
+                self.track_pathname_in_index(pathname)
         elif os.path.isdir(pathname):
             for dirpath, subdir, filenames in os.walk(pathname):
+                # The .git directory is used for git repo management
+                # It should never track this directory
+                logger.info('Creating blob object by accessing dirpath = {} and subdir = {} and filenames = {}'.format(dirpath, subdir, filenames))
+                if '.git' in dirpath:
+                    continue
+
                 for filename in filenames:
                     full_pathname = os.path.join(dirpath, filename)
-                    with open(full_pathname, 'r') as f:
-                        content = f.read()
-                        content_hash = self.create_hash(content)
-                        self.store_blob(content_hash, content)
-                        self.track_pathname_in_index_if_not_exists(full_pathname)
+                    content_hash = self.create_blob_object(full_pathname)
 
         return content_hash
