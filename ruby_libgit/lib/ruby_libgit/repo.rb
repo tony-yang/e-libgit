@@ -7,7 +7,7 @@ module RubyLibgit
     def initialize
       RubyLibgit::Logging.logger.info('Create a new Repo')
       @pwd = ::Dir.pwd
-      @objects = RubyLibgit::Objects.new
+      @objects = RubyLibgit::Objects.new(self)
       @refs = RubyLibgit::Refs.new
       @head_ref = RubyLibgit::HeadRef.new
     end

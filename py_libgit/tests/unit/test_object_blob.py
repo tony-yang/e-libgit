@@ -4,11 +4,11 @@ from unittest.mock import MagicMock
 
 import hashlib, os, shutil
 from py_libgit.core.exceptions import BlobHashConflictError
-from py_libgit.core.object import Object
+from py_libgit.core.object_blob import ObjectBlob
 
 import py_libgit.settings_tests
 
-class TestObject(unittest.TestCase):
+class TestObjectBlob(unittest.TestCase):
     def setUp(self):
         self.git_repo = '/tmp/objects-repo'
         self.git_root_dir = os.path.join(self.git_repo, '.git')
@@ -19,7 +19,7 @@ class TestObject(unittest.TestCase):
         os.makedirs(self.objects_dir)
         os.chdir(self.objects_dir)
 
-        self.obj = Object(repo)
+        self.obj = ObjectBlob(repo)
 
     def tearDown(self):
         shutil.rmtree(self.git_repo, ignore_errors=True)

@@ -2,7 +2,7 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import os
-from py_libgit.core.object import Object
+from py_libgit.core.object_blob import ObjectBlob
 
 class Objects:
     def __init__(self, repo):
@@ -25,7 +25,8 @@ class Objects:
         os.makedirs(objects_dir, mode=0o644)
 
     def create_object(self, pathname):
-        full_pathname = os.path.join(self.pwd, pathname)
-        blob_object = Object(self.repo)
-        content_hash = blob_object.create_blob_object(pathname)
+        pwd = os.getcwd()
+        full_pathname = os.path.join(pwd, pathname)
+        blob_object = ObjectBlob(self.repo)
+        content_hash = blob_object.create_blob_object(full_pathname)
         return content_hash

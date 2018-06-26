@@ -6,7 +6,7 @@ from py_libgit.core.exceptions import BlobHashConflictError
 from py_libgit.core.index import Index
 
 
-class Object:
+class ObjectBlob:
     def __init__(self, repo):
         logger.info('Create a new Object object')
         self.repo = repo

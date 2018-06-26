@@ -22,4 +22,21 @@ module RubyLibgit
       end
     end
   end
+
+  # The Git add API class
+  class Add
+    def initialize
+      RubyLibgit::Logging.logger.info('Create the Add object')
+      @repo = RubyLibgit::Repo.new
+      @objects = RubyLibgit::Objects.new(@repo)
+    end
+
+    # Create a new blob under the object directory that saves the actual file content
+    # Params:
+    # - pathname: the name of the file to be added into the repo
+    def create_blob(pathname)
+      @pathname = pathname
+      @objects.create_object(@pathname)
+    end
+  end
 end

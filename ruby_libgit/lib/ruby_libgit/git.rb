@@ -77,9 +77,13 @@ module RubyLibgit
 
     def run
       if @options.key?(:init)
-        RubyLibgit::Logging.logger.info('Called with init repo_name ' + @options[:init][:non_option_arg])
+        RubyLibgit::Logging.logger.info("Called with init repo_name #{@options[:init][:non_option_arg]}")
         init = RubyLibgit::Init.new
         init.create_git_repo(@options[:init][:non_option_arg], @options[:init][:bare])
+      elsif @options.key?(:add)
+        RubyLibgit::Logging.logger.info('Called with add')
+        add = RubyLibgit::Add.new
+        add.create_blob(@options[:init][:pathname])
       end
     end
   end

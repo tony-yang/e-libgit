@@ -17,7 +17,7 @@ class Add:
         The hash of the blob object, which is also the filename
 
         Keyword arguments:
-        filename -- the name of the file to be added into the repo
+        pathname -- the name of the file to be added into the repo
         '''
         self.pathname = pathname
         blob_hash = self.objects.create_object(self.pathname)
