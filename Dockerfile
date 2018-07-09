@@ -12,6 +12,7 @@ RUN gem install \
     rake \
     rubocop \
     rspec \
+    rspec-mocks \
     simplecov
 
 ADD . /root/

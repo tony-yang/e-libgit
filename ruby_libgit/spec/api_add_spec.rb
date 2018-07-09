@@ -26,6 +26,10 @@ describe RubyLibgit::Add do
     end
 
     content_hash = @add.create_blob(filename)
-    expect(content_hash).to eq('123')
+    expect(content_hash).to eq('22596363b3de40b06f981fb85d82312e8c0ed511')
+
+    object_blob_path = ::File.join(pwd, @repo_name, '.git', 'objects', '22', '596363b3de40b06f981fb85d82312e8c0ed511')
+    object_blob = ::File.exist?(object_blob_path)
+    expect(object_blob).to be true
   end
 end

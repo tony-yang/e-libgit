@@ -1,3 +1,5 @@
+require 'digest'
+require 'fileutils'
 require 'ruby_libgit'
 
 module RubyLibgit
@@ -10,14 +12,26 @@ module RubyLibgit
 
     def create_hash(content)
       RubyLibgit::Logging.logger.info("content = #{content}")
-      content_hash = '123'
+      content_hash = Digest::SHA1.hexdigest content
       RubyLibgit::Logging.logger.info("hash of content = #{content_hash}")
       content_hash
     end
 
     def store_blob(content_hash, content)
       RubyLibgit::Logging.logger.info("In dir = #{::Dir.pwd}")
-      #root_dir = @repo.get_repo_root(::Dir.pwd)
+      root_dir = @repo.get_repo_root(::Dir.pwd)
+      object_dir = ::File.join(root_dir, 'objects', content_hash[0, 2])
+      full_path = ::File.join(object_dir, content_hash[2..-1])
+      if ::File.exist?(full_path)
+        raise RubyLibgit::BlobHashConflictError, 'There is a conflict in blob hash. This will cause information loss.'
+      else
+        RubyLibgit::Logging.logger.info("Create a new blob hash wit hash = #{content_hash} at dir = #{object_dir}")
+        FileUtils.mkdir_p(object_dir, mode: 0o644)
+        RubyLibgit::Logging.logger.info("Creating object blob at = #{full_path}")
+        ::File.open(full_path, 'w') do |f|
+          f.write(content)
+        end
+      end
     end
 
     def create_blob_object(pathname)
