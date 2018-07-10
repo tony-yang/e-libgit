@@ -28,7 +28,7 @@ module RubyLibgit
     def get_repo_root(current_dir)
       until ::Dir.exist?(::File.join(current_dir, '.git'))
         current_dir = ::File.dirname(::File.expand_path(current_dir))
-        if '/'.eq(current_dir)
+        if '/'.eql? current_dir
           error_msg = 'Not a git repository. Please run `git init` at the top-most level of this project'
           raise RubyLibgit::NotGitRepoError, error_msg
         end

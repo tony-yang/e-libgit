@@ -22,7 +22,7 @@ describe RubyLibgit::ObjectBlob do
 
   it 'successfully stores blob on new blob hash' do
     content_hash = Digest::SHA1.hexdigest @content
-    @obj.store_blob(content_hash, @content)
+    @obj.send :store_blob, content_hash, @content
 
     filename = ::File.join(content_hash[0, 2], content_hash[2..-1])
     blob_file = ::File.exist?(::File.join(@objects_dir, filename))

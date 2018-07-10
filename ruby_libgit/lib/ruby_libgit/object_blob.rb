@@ -10,6 +10,27 @@ module RubyLibgit
       @repo = repo
     end
 
+    def create_blob_object(pathname)
+      content_hash = nil
+      if ::File.file?(pathname)
+        ::File.open(pathname, 'r') do |f|
+          content = f.read
+          content_hash = create_hash(content)
+          store_blob(content_hash, content)
+        end
+      elsif ::File.directory?(pathname)
+        match_dir = ::File.join(pathname, '**', '*')
+        ::Dir.glob(match_dir, ::File::FNM_DOTMATCH) do |path|
+          next if path.include? '.git'
+          RubyLibgit::Logging.logger.info("Creating blob object for path = #{path}")
+          content_hash = create_blob_object(path) if ::File.file?(path)
+        end
+      end
+      content_hash
+    end
+
+    private
+
     def create_hash(content)
       RubyLibgit::Logging.logger.info("content = #{content}")
       content_hash = Digest::SHA1.hexdigest content
@@ -32,20 +53,6 @@ module RubyLibgit
           f.write(content)
         end
       end
-    end
-
-    def create_blob_object(pathname)
-      content_hash = nil
-      if ::File.file?(pathname)
-        ::File.open(pathname, 'r') do |f|
-          content = f.read
-          content_hash = create_hash(content)
-          store_blob(content_hash, content)
-        end
-      elsif ::File.directory?(pathname)
-        content_hash = '123'
-      end
-      content_hash
     end
   end
 end

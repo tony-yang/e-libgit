@@ -39,4 +39,12 @@ describe RubyLibgit::Repo do
     expected_path = ::File.join(full_path, '.git')
     expect(repo_root_dir).to eq(expected_path)
   end
+
+  it 'raises exception when not a git repo' do
+    non_git_dir = '/tmp/non-repo'
+    FileUtils.mkdir_p(non_git_dir)
+    ::Dir.chdir(non_git_dir)
+
+    expect{ repo.send :get_repo_root, non_git_dir }.to raise_error(RubyLibgit::NotGitRepoError)
+  end
 end
