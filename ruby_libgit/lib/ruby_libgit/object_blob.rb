@@ -17,6 +17,7 @@ module RubyLibgit
           content = f.read
           content_hash = create_hash(content)
           store_blob(content_hash, content)
+          track_pathname_in_index(pathname)
         end
       elsif ::File.directory?(pathname)
         match_dir = ::File.join(pathname, '**', '*')
@@ -53,6 +54,11 @@ module RubyLibgit
           f.write(content)
         end
       end
+    end
+
+    def track_pathname_in_index(pathname)
+      index = RubyLibgit::Index.new(@repo)
+      index.update_index(pathname)
     end
   end
 end
