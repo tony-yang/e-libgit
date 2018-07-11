@@ -13,21 +13,20 @@ module RubyLibgit
       @options = parse(ARGV)
     end
 
-    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def parse(args = ARGV)
-      options = {
-        init: { bare: false }
-      }
-
+      options = {}
       subcommands = {
         init: OptionParser.new do |o|
           o.banner = 'usage: git init <repo_name> [<args>] - Create an empty Git repository'
           o.on('--[no-]bare', 'Create a bare repository') do |b|
             options[:init][:bare] = b
           end
+        end,
+        add: OptionParser.new do |o|
+          o.banner = 'usage: git add <pathname> - Add new/changed file to the repository'
         end
       }
-
       parser = OptionParser.new do |o|
         o.banner = "usage: git <command> [<args>]\n\n"
         subcommands.each do |subcommand, subparser|
@@ -40,8 +39,7 @@ module RubyLibgit
           exit
         end
       end
-
-      if args.empty? || !(args[0].start_with?('-') || options.key?(args[0].to_sym))
+      if args.empty? || args[0].start_with?('-')
         puts parser.help
         exit
       end
@@ -54,6 +52,7 @@ module RubyLibgit
         else
           begin
             subcommands[subcommand].order! do |non_option_arg|
+              options[subcommand] = {}
               options[subcommand][:non_option_arg] = non_option_arg
             end
           rescue OptionParser::ParseError => error
@@ -73,18 +72,19 @@ module RubyLibgit
       end
       options
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
 
     def run
       if @options.key?(:init)
         RubyLibgit::Logging.logger.info("Called with init repo_name #{@options[:init][:non_option_arg]}")
+        @options[:init][:bare] = false unless @options[:init][:bare]
         init = RubyLibgit::Init.new
         init.create_git_repo(@options[:init][:non_option_arg], @options[:init][:bare])
       elsif @options.key?(:add)
-        RubyLibgit::Logging.logger.info('Called with add')
+        RubyLibgit::Logging.logger.info("Called with add pathname #{@options[:add][:non_option_arg]}")
         add = RubyLibgit::Add.new
-        add.create_blob(@options[:init][:pathname])
+        add.create_blob(@options[:add][:non_option_arg])
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
   end
 end
