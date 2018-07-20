@@ -40,14 +40,14 @@ class Index:
             if item == repo_name:
                 repo_name_index = i
                 break
-
+                
         reduced_pathes = []
-        while i < len(pathes):
-            item = pathes[i]
+        while repo_name_index < len(pathes):
+            item = pathes[repo_name_index]
             if item and item == '..':
                 reduced_pathes.pop()
             elif item and item != '.':
                 reduced_pathes.append(item)
-            i += 1
+            repo_name_index += 1
         normalized_path = '/'.join(reduced_pathes)
         return normalized_path

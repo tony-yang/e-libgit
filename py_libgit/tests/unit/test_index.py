@@ -9,14 +9,16 @@ import py_libgit.settings_tests
 
 class TestIndex(unittest.TestCase):
     def setUp(self):
-        repo = MagicMock()
         self.repo_name = 'repotest'
         self.repo_dir = os.path.join('/tmp', self.repo_name)
         self.git_repo_root = os.path.join(self.repo_dir, '.git')
         os.makedirs(self.git_repo_root)
+
+        repo = MagicMock()
         repo.get_repo_root = MagicMock(return_value=self.git_repo_root)
+
         self.index = Index(repo)
-        self.index_file = os.path.join(self.repo_dir, '.git', 'index')
+        self.index_file = os.path.join(self.git_repo_root, 'index')
 
     def tearDown(self):
         shutil.rmtree(self.repo_dir, ignore_errors=True)
@@ -24,11 +26,11 @@ class TestIndex(unittest.TestCase):
     def test_index_updated_correctly_when_no_entry(self):
         pathname = 'helloworld'
         self.index.update_index(pathname)
+        self.assertTrue(os.path.exists(self.index_file))
+
         with open(self.index_file, 'r') as f:
             index_content = f.read()
-
         expected_index_content = '{}\n'.format(pathname)
-        self.assertTrue(os.path.exists(self.index_file))
         self.assertEqual(index_content, expected_index_content, 'The index content did not record the proper pathname')
 
     def test_duplicate_index_update_should_not_occur(self):

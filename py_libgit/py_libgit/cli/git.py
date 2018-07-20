@@ -15,7 +15,7 @@ def main():
     init_parser.add_argument('repo_name', help='New repository name. Should only use letters, digits, _, ., and - in the name')
     init_parser.add_argument('--bare', action='store_true', help='Create a bare repository')
 
-    add_parser = subparsers.add_parser('add', help='Add file contents to the index')
+    add_parser = subparsers.add_parser('add', help='Add new/changed file to the repository')
     add_parser.add_argument('pathname', help='The files or directoies to be added')
 
     args = parser.parse_args()
