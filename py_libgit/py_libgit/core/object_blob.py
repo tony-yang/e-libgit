@@ -3,7 +3,6 @@ logger = logging.getLogger(__name__)
 
 import hashlib, os
 from py_libgit.core.exceptions import BlobHashConflictError
-from py_libgit.core.index import Index
 
 
 class ObjectBlob:
@@ -16,10 +15,6 @@ class ObjectBlob:
         content_hash = hashlib.sha1(content.encode()).hexdigest()
         logger.info('hash of content = {}'.format(content_hash))
         return content_hash
-
-    def track_pathname_in_index(self, pathname):
-        index = Index(self.repo)
-        index.update_index(pathname)
 
     def store_blob(self, content_hash, content):
         logger.info('In dir = {}'.format(os.getcwd()))
@@ -36,23 +31,18 @@ class ObjectBlob:
             with open(full_path, 'w') as f:
                 f.write(content)
 
-    def create_blob_object(self, pathname):
-        if os.path.isfile(pathname):
-            with open(pathname, 'r') as f:
-                content = f.read()
-                content_hash = self.create_hash(content)
-                self.store_blob(content_hash, content)
-                self.track_pathname_in_index(pathname)
-        elif os.path.isdir(pathname):
-            for dirpath, subdir, filenames in os.walk(pathname):
-                # The .git directory is used for git repo management
-                # Git's index should never track this directory
-                if '.git' in dirpath:
-                    continue
+    def create_blob_object(self, filename):
+        if not os.path.isfile(filename):
+            raise IsADirectoryError
 
-                logger.info('Creating blob object by accessing dirpath = {} and subdir = {} and filenames = {}'.format(dirpath, subdir, filenames))
-                for filename in filenames:
-                    full_pathname = os.path.join(dirpath, filename)
-                    content_hash = self.create_blob_object(full_pathname)
+        with open(filename, 'r') as f:
+            content = f.read()
+            content_hash = self.create_hash(content)
+            try:
+                self.store_blob(content_hash, content)
+            except BlobHashConflictError:
+                # In this case, we treat it as the same content
+                # Do nothing and continue
+                pass
 
         return content_hash

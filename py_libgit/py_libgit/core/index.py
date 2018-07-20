@@ -2,6 +2,7 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import os
+from py_libgit.core.index_entry import IndexEntry
 
 class Index:
     def __init__(self, repo):
@@ -12,24 +13,43 @@ class Index:
 
     def build_tracked_index(self):
         tracked_index = {}
+        # The index file format
+        # pathname current_sha1 staged_sha1 unix_mode
         with open(self.index_file, 'r') as files:
-            for file in files:
-                tracked_index[file.strip()] = True
+            for item in files:
+                file_attributes = item.split()
+                tracked_index[file_attributes[0].strip()] = IndexEntry(
+                    pathname=file_attributes[0].strip(),
+                    current_sha1=file_attributes[1].strip(),
+                    new_sha1=file_attributes[2].strip(),
+                    unix_mode=file_attributes[3].strip()
+                    )
         return tracked_index
 
-    def update_index(self, pathname):
-        pathname = self.normalize_pathname(pathname)
+    def update_index(self, staging_content=[]):
         tracked_index = {}
-        if os.path.exists(self.index_file):
-            tracked_index = self.build_tracked_index()
+        for index_entry in staging_content:
+            pathname = self.normalize_pathname(index_entry.pathname)
+            if os.path.exists(self.index_file):
+                tracked_index = self.build_tracked_index()
 
-        if pathname not in tracked_index:
-            with open(self.index_file, 'a') as f:
-                f.write('{}\n'.format(pathname))
+            # The index file format
+            # pathname current_sha1 staged_sha1 unix_mode
+            # current_sha1 is 0 for new file
+            if pathname not in tracked_index:
+                current_sha1 = '0'*40
+            else:
+                current_sha1 = tracked_index[pathname].current_sha1
+            tracked_index[pathname] = IndexEntry(
+                pathname=pathname,
+                current_sha1=current_sha1,
+                new_sha1=index_entry.new_sha1,
+                unix_mode=index_entry.unix_mode
+            )
 
-            return True
-
-        return False
+        with open(self.index_file, 'w') as f:
+            for pathname, index_entry in tracked_index.items():
+                f.write('{} {} {} {}\n'.format(pathname, index_entry.current_sha1, index_entry.new_sha1, index_entry.unix_mode))
 
     def normalize_pathname(self, pathname):
         repo_dirs = os.path.dirname(self.git_root).split('/')
@@ -40,7 +60,7 @@ class Index:
             if item == repo_name:
                 repo_name_index = i
                 break
-                
+
         reduced_pathes = []
         while repo_name_index < len(pathes):
             item = pathes[repo_name_index]

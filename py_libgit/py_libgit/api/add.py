@@ -20,5 +20,5 @@ class Add:
         pathname -- the name of the file to be added into the repo
         '''
         self.pathname = pathname
-        blob_hash = self.objects.create_object(self.pathname)
+        blob_hash = self.objects.create_objects(self.pathname)
         return blob_hash
