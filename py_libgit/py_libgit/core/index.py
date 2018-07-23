@@ -8,14 +8,14 @@ class Index:
     def __init__(self, repo):
         logger.info('Create an Index object')
         self.repo = repo
-        self.git_root = self.repo.get_repo_root(os.getcwd())
-        self.index_file = os.path.join(self.git_root, 'index')
 
     def build_tracked_index(self):
+        git_root = self.repo.get_repo_root(os.getcwd())
+        index_file = os.path.join(git_root, 'index')
         tracked_index = {}
         # The index file format
         # pathname current_sha1 staged_sha1 unix_mode
-        with open(self.index_file, 'r') as files:
+        with open(index_file, 'r') as files:
             for item in files:
                 file_attributes = item.split()
                 tracked_index[file_attributes[0].strip()] = IndexEntry(
@@ -27,10 +27,12 @@ class Index:
         return tracked_index
 
     def update_index(self, staging_content=[]):
+        git_root = self.repo.get_repo_root(os.getcwd())
+        index_file = os.path.join(git_root, 'index')
         tracked_index = {}
         for index_entry in staging_content:
             pathname = self.normalize_pathname(index_entry.pathname)
-            if os.path.exists(self.index_file):
+            if os.path.exists(index_file):
                 tracked_index = self.build_tracked_index()
 
             # The index file format
@@ -47,12 +49,14 @@ class Index:
                 unix_mode=index_entry.unix_mode
             )
 
-        with open(self.index_file, 'w') as f:
-            for pathname, index_entry in tracked_index.items():
+        with open(index_file, 'w') as f:
+            for pathname in sorted(tracked_index):
+                index_entry = tracked_index[pathname]
                 f.write('{} {} {} {}\n'.format(pathname, index_entry.current_sha1, index_entry.new_sha1, index_entry.unix_mode))
 
     def normalize_pathname(self, pathname):
-        repo_dirs = os.path.dirname(self.git_root).split('/')
+        git_root = self.repo.get_repo_root(os.getcwd())
+        repo_dirs = os.path.dirname(git_root).split('/')
         repo_name = repo_dirs[-1]
         pathes = pathname.split('/')
         repo_name_index = 0

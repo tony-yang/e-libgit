@@ -9,6 +9,8 @@ from py_libgit.core.exceptions import NotGitRepoError
 
 # Make sure this is after all other import to override the logger setting
 import py_libgit.settings_tests
+import logging
+logger = logging.getLogger(__name__)
 
 class TestRepo(unittest.TestCase):
     def setUp(self):
@@ -16,6 +18,8 @@ class TestRepo(unittest.TestCase):
         self.repo_name = 'hello-git'
         self.init = Init()
         self.init.create_git_repo(self.repo_name)
+
+        os.chdir('/tmp/hello-git')
         self.git_repo = Repo()
 
     def tearDown(self):

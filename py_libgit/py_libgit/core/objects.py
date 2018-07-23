@@ -2,15 +2,17 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import os
-from py_libgit.core.index import Index
+from py_libgit.core.commit_tree import CommitTree
 from py_libgit.core.index_entry import IndexEntry
 from py_libgit.core.object_blob import ObjectBlob
+from py_libgit.core.tree_entry import TreeEntry, EntryType
 
 class Objects:
-    def __init__(self, repo):
+    def __init__(self, repo, index):
         logger.info('Create an Objects object')
         self.pwd = os.getcwd()
         self.repo = repo
+        self.index = index
 
     def create_objects_dir(self, repo_name, bare_repo=False):
         '''Create the objects directory for holding the git objects
@@ -30,7 +32,6 @@ class Objects:
         pwd = os.getcwd()
         full_pathname = os.path.join(pwd, pathname)
         blob_object = ObjectBlob(self.repo)
-        index = Index(self.repo)
 
         staging_content = []
 
@@ -50,6 +51,28 @@ class Objects:
                     full_pathname = os.path.join(dirpath, filename)
                     content_hash = blob_object.create_blob_object(full_pathname)
                     staging_content.append(IndexEntry(full_pathname, new_sha1=content_hash))
+        else:
+            return None
 
-        index.update_index(staging_content)
+        self.index.update_index(staging_content)
         return content_hash
+
+    def commit_cached_tree_objects(self):
+        tracked_index = self.index.build_tracked_index()
+        git_root_name = self.repo.get_repo_root(os.getcwd()).split('/')[-2]
+        root = CommitTree(self.repo, TreeEntry(git_root_name, entry_type=EntryType.TREE))
+        commit_trees = {git_root_name: root}
+        for pathname, attributes in tracked_index.items():
+            pathname_structure = pathname.split('/')
+            for i, item in enumerate(pathname_structure):
+                if item not in commit_trees:
+                    if i < len(pathname_structure)-1:
+                        subtree = CommitTree(self.repo, TreeEntry(item, entry_type=EntryType.TREE, sha1=attributes.new_sha1))
+                    else:
+                        subtree = CommitTree(self.repo, TreeEntry(item, entry_type=EntryType.BLOB, sha1=attributes.new_sha1))
+                    commit_trees[item] = subtree
+                    parent_tree = commit_trees[pathname_structure[i-1]]
+                    parent_tree.add_subtree(subtree)
+        root_tree_entry = root.commit_tree_blob()
+        logger.info('The root tree entry = {}'.format(root_tree_entry))
+        return root_tree_entry

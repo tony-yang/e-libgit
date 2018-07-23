@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
 
-
 import hashlib, os, shutil
 from py_libgit.core.exceptions import BlobHashConflictError
 from py_libgit.core.object_blob import ObjectBlob
@@ -13,7 +12,6 @@ class TestObjectBlob(unittest.TestCase):
         self.git_repo = '/tmp/objects-repo'
         self.git_root_dir = os.path.join(self.git_repo, '.git')
         self.objects_dir = os.path.join(self.git_root_dir, 'objects')
-
         repo = MagicMock()
         repo.get_repo_root = MagicMock(return_value=self.git_root_dir)
         os.makedirs(self.objects_dir)

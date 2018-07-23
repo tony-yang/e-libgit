@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 
 import os, re
 from py_libgit.core.head_ref import HeadRef
+from py_libgit.core.index import Index
 from py_libgit.core.objects import Objects
 from py_libgit.core.refs import Refs
 from py_libgit.core.exceptions import FileNamingConventionError
@@ -12,7 +13,8 @@ class Repo:
     def __init__(self):
         logger.info('Create a new Repo')
         self.pwd = os.getcwd()
-        self.objects = Objects(self)
+        self.index = Index(self)
+        self.objects = Objects(self, self.index)
         self.refs = Refs()
         self.head_ref = HeadRef()
 
@@ -58,3 +60,10 @@ class Repo:
                 raise NotGitRepoError(current_dir, 'Not a git repository. Please run `git init` at the top-most level of this project')
         current_dir = os.path.join(current_dir, '.git')
         return current_dir
+
+    def add_objects(self, pathname):
+        blob_hash = self.objects.create_objects(pathname)
+        return blob_hash
+
+    def commit_tree(self):
+        return self.objects.commit_cached_tree_objects()

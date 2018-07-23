@@ -14,6 +14,7 @@ class TestIndex(unittest.TestCase):
         self.repo_dir = os.path.join('/tmp', self.repo_name)
         self.git_repo_root = os.path.join(self.repo_dir, '.git')
         os.makedirs(self.git_repo_root)
+        os.chdir(self.repo_dir)
 
         repo = MagicMock()
         repo.get_repo_root = MagicMock(return_value=self.git_repo_root)

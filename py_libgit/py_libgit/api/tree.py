@@ -8,7 +8,6 @@ class Tree:
     def __init__(self):
         logger.info('Create the Tree object')
         self.repo = Repo()
-        self.tree = TreeBlob(self.repo)
 
     def create_tree(self):
         '''Create a new tree under the object directory to save the tree structure of the repository
@@ -16,5 +15,5 @@ class Tree:
         Return:
         the hash of the tree entry
         '''
-        tree_hash = self.tree.create_tree()
-        return tree_hash
+        tree_entry = self.repo.commit_tree()
+        return tree_entry
