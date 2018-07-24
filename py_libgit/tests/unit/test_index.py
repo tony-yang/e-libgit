@@ -30,7 +30,7 @@ class TestIndex(unittest.TestCase):
         current_sha1 = '0' * 40
         new_sha1 = '0123456789' * 4
         unix_mode = '10000644'
-        staging_content = [IndexEntry(pathname, new_sha1=new_sha1)]
+        staging_content = [IndexEntry(pathname, current_sha1=current_sha1, new_sha1=new_sha1)]
         self.index.update_index(staging_content)
         self.assertTrue(os.path.exists(self.index_file))
 
@@ -73,7 +73,7 @@ class TestIndex(unittest.TestCase):
         expected_index_content = '{} {} {} {}\n{} {} {} {}\n'.format(pathname, current_sha1, new_sha1, unix_mode, pathname_2, current_sha1_2, new_sha1_2, unix_mode_2)
         self.assertEqual(index_content, expected_index_content, 'The index content did not record both pathnames')
 
-    def test_updaing_index_entry_should_work(self):
+    def test_updaing_index_entry_new_sha1_should_work(self):
         pathname = 'helloworld'
         current_sha1 = '0' * 40
         new_sha1 = '0123456789' * 4
@@ -81,15 +81,35 @@ class TestIndex(unittest.TestCase):
 
         new_sha1_2 = '9876543210' * 4
 
-        staging_content = [IndexEntry(pathname, new_sha1=new_sha1)]
+        staging_content = [IndexEntry(pathname, current_sha1=current_sha1, new_sha1=new_sha1)]
         self.index.update_index(staging_content)
-        staging_content = [IndexEntry(pathname, new_sha1=new_sha1_2)]
+        staging_content = [IndexEntry(pathname, current_sha1=current_sha1, new_sha1=new_sha1_2)]
         self.index.update_index(staging_content)
+
         with open(self.index_file, 'r') as f:
             index_content = f.read()
 
         expected_index_content = '{} {} {} {}\n'.format(pathname, current_sha1, new_sha1_2, unix_mode)
-        self.assertEqual(index_content, expected_index_content, 'The index content did not update the path attributes properly')
+        self.assertEqual(index_content, expected_index_content, 'The index content did not update the new_sha1 attributes properly')
+
+    def test_updaing_index_entry_current_sha_should_work(self):
+        pathname = 'helloworld'
+        current_sha1 = '0' * 40
+        new_sha1 = '0123456789' * 4
+        unix_mode = '10000644'
+
+        current_sha1_new = '0123456789' * 4
+
+        staging_content = [IndexEntry(pathname, current_sha1=current_sha1, new_sha1=new_sha1)]
+        self.index.update_index(staging_content)
+        staging_content = [IndexEntry(pathname, current_sha1=current_sha1_new, new_sha1=new_sha1)]
+        self.index.update_index(staging_content)
+
+        with open(self.index_file, 'r') as f:
+            index_content = f.read()
+
+        expected_index_content = '{} {} {} {}\n'.format(pathname, current_sha1_new, new_sha1, unix_mode)
+        self.assertEqual(index_content, expected_index_content, 'The index content did not update the current_sha1 attributes properly')
 
     def test_normalize_pathname_removes_single_dot_path(self):
         pathname = os.path.join(self.repo_dir, 'abc/./test')
@@ -120,3 +140,7 @@ class TestIndex(unittest.TestCase):
         normalized_pathname = self.index.normalize_pathname(pathname)
         expected_pathname = os.path.join(self.repo_name, 'abc/test3')
         self.assertEqual(normalized_pathname, expected_pathname, 'The double dot in the normalized path is not properly handled')
+
+    def test_build_tracked_index_should_return_empty_dictionary_if_index_not_exists(self):
+        tracked_index = self.index.build_tracked_index()
+        self.assertEqual(tracked_index, {}, 'Returned the incorrect tracked_index when index file not exists')

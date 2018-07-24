@@ -13,6 +13,10 @@ class Index:
         git_root = self.repo.get_repo_root(os.getcwd())
         index_file = os.path.join(git_root, 'index')
         tracked_index = {}
+
+        if not os.path.exists(index_file):
+            return {}
+
         # The index file format
         # pathname current_sha1 staged_sha1 unix_mode
         with open(index_file, 'r') as files:
@@ -26,25 +30,21 @@ class Index:
                     )
         return tracked_index
 
-    def update_index(self, staging_content=[]):
+    def update_index(self, index_content=[]):
         git_root = self.repo.get_repo_root(os.getcwd())
         index_file = os.path.join(git_root, 'index')
         tracked_index = {}
-        for index_entry in staging_content:
+        if os.path.exists(index_file):
+            tracked_index = self.build_tracked_index()
+            
+        for index_entry in index_content:
             pathname = self.normalize_pathname(index_entry.pathname)
-            if os.path.exists(index_file):
-                tracked_index = self.build_tracked_index()
-
             # The index file format
             # pathname current_sha1 staged_sha1 unix_mode
             # current_sha1 is 0 for new file
-            if pathname not in tracked_index:
-                current_sha1 = '0'*40
-            else:
-                current_sha1 = tracked_index[pathname].current_sha1
             tracked_index[pathname] = IndexEntry(
                 pathname=pathname,
-                current_sha1=current_sha1,
+                current_sha1=index_entry.current_sha1,
                 new_sha1=index_entry.new_sha1,
                 unix_mode=index_entry.unix_mode
             )

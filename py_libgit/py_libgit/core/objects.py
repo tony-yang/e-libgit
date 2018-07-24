@@ -34,10 +34,15 @@ class Objects:
         blob_object = ObjectBlob(self.repo)
 
         staging_content = []
+        tracked_index = self.index.build_tracked_index()
 
         if os.path.isfile(full_pathname):
             content_hash = blob_object.create_blob_object(full_pathname)
-            staging_content.append(IndexEntry(full_pathname, new_sha1=content_hash))
+            current_sha1 = '0'*40
+            normalized_path = self.index.normalize_pathname(full_pathname)
+            if normalized_path in tracked_index:
+                current_sha1 = tracked_index[normalized_path].current_sha1
+            staging_content.append(IndexEntry(full_pathname, current_sha1=current_sha1, new_sha1=content_hash))
         elif os.path.isdir(full_pathname):
             pathname = full_pathname
             for dirpath, subdir, filenames in os.walk(pathname):
@@ -50,7 +55,11 @@ class Objects:
                 for filename in filenames:
                     full_pathname = os.path.join(dirpath, filename)
                     content_hash = blob_object.create_blob_object(full_pathname)
-                    staging_content.append(IndexEntry(full_pathname, new_sha1=content_hash))
+                    current_sha1 = '0'*40
+                    normalized_path = self.index.normalize_pathname(full_pathname)
+                    if normalized_path in tracked_index:
+                        current_sha1 = tracked_index[normalized_path].current_sha1
+                    staging_content.append(IndexEntry(full_pathname, current_sha1=current_sha1, new_sha1=content_hash))
         else:
             return None
 
@@ -58,6 +67,7 @@ class Objects:
         return content_hash
 
     def commit_cached_tree_objects(self):
+        index_content = []
         tracked_index = self.index.build_tracked_index()
         git_root_name = self.repo.get_repo_root(os.getcwd()).split('/')[-2]
         root = CommitTree(self.repo, TreeEntry(git_root_name, entry_type=EntryType.TREE))
@@ -70,9 +80,11 @@ class Objects:
                         subtree = CommitTree(self.repo, TreeEntry(item, entry_type=EntryType.TREE, sha1=attributes.new_sha1))
                     else:
                         subtree = CommitTree(self.repo, TreeEntry(item, entry_type=EntryType.BLOB, sha1=attributes.new_sha1))
+                        index_content.append(IndexEntry(pathname, current_sha1=attributes.new_sha1, new_sha1=attributes.new_sha1))
                     commit_trees[item] = subtree
                     parent_tree = commit_trees[pathname_structure[i-1]]
                     parent_tree.add_subtree(subtree)
         root_tree_entry = root.commit_tree_blob()
         logger.info('The root tree entry = {}'.format(root_tree_entry))
+        self.index.update_index(index_content)
         return root_tree_entry

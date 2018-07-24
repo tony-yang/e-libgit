@@ -8,3 +8,6 @@ class IndexEntry:
         self.current_sha1 = current_sha1
         self.new_sha1 = new_sha1
         self.unix_mode = unix_mode
+
+    def __repr__(self):
+        return 'IndexEntry: <pathname: {}, current_sha1: {}, new_sha1: {}, unix_mode: {}>'.format(self.pathname, self.current_sha1, self.new_sha1, self.unix_mode)

@@ -33,8 +33,31 @@ class TestAdd(unittest.TestCase):
         object_blob = os.path.exists(object_blob_path)
         self.assertTrue(object_blob, 'The hello object is not created under the object directory')
 
+    def test_add_same_blob_twice_successfully(self):
+        content_hash = self.add.create_blob(self.filename)
+        content_hash = self.add.create_blob(self.filename)
+        self.assertEqual(content_hash, '22596363b3de40b06f981fb85d82312e8c0ed511', 'Incorrect blob hash')
+
+        object_blob_path = os.path.join(self.pwd, self.repo_name, '.git', 'objects', '22', '596363b3de40b06f981fb85d82312e8c0ed511')
+        object_blob = os.path.exists(object_blob_path)
+        self.assertTrue(object_blob, 'The hello object is not created under the object directory')
+
     def test_add_using_shell_wildcard_glob(self):
         shell_glob = '.'
+        content_hash = self.add.create_blob(shell_glob)
+        self.assertEqual(content_hash, '22596363b3de40b06f981fb85d82312e8c0ed511', 'Incorrect blob hash')
+
+        object_blob_path = os.path.join(self.pwd, self.repo_name, '.git', 'objects', '22', '596363b3de40b06f981fb85d82312e8c0ed511')
+        object_blob = os.path.exists(object_blob_path)
+        self.assertTrue(object_blob, 'The hello object is not created under the object directory')
+
+        git_HEAD_blob_path = os.path.join(self.pwd, self.repo_name, '.git', 'objects', '7b', 'eb154244f8644b1f14114de8a1acc836d67e88')
+        HEAD_blob = os.path.exists(git_HEAD_blob_path)
+        self.assertFalse(HEAD_blob, 'The HEAD object should not be tracked and created under the object directory')
+
+    def test_add_twice_using_shell_wildcard_glob(self):
+        shell_glob = '.'
+        content_hash = self.add.create_blob(shell_glob)
         content_hash = self.add.create_blob(shell_glob)
         self.assertEqual(content_hash, '22596363b3de40b06f981fb85d82312e8c0ed511', 'Incorrect blob hash')
 
