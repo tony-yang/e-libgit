@@ -15,5 +15,5 @@ class Tree:
         Return:
         the hash of the tree entry
         '''
-        tree_entry = self.repo.commit_tree()
+        tree_entry = self.repo.create_tree()
         return tree_entry

@@ -2,8 +2,8 @@ import unittest
 
 import os, shutil
 from py_libgit.api.add import Add
-from py_libgit.api.tree import Tree
 from py_libgit.api.init import Init
+from py_libgit.api.tree import Tree
 from py_libgit.core.tree_entry import TreeEntry, EntryType
 
 import py_libgit.settings_tests

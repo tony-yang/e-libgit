@@ -65,5 +65,8 @@ class Repo:
         blob_hash = self.objects.create_objects(pathname)
         return blob_hash
 
-    def commit_tree(self):
-        return self.objects.commit_cached_tree_objects()
+    def create_tree(self):
+        return self.objects.create_cached_tree_objects()
+
+    def create_commit(self, author, message, root_tree_entry):
+        return self.objects.create_commit(author, message, root_tree_entry)

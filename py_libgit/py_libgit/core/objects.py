@@ -2,6 +2,8 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import os
+from py_libgit.core.commit_blob import CommitBlob
+from py_libgit.core.commit_entry import CommitEntry
 from py_libgit.core.commit_tree import CommitTree
 from py_libgit.core.index_entry import IndexEntry
 from py_libgit.core.object_blob import ObjectBlob
@@ -66,7 +68,7 @@ class Objects:
         self.index.update_index(staging_content)
         return content_hash
 
-    def commit_cached_tree_objects(self):
+    def create_cached_tree_objects(self):
         index_content = []
         tracked_index = self.index.build_tracked_index()
         git_root_name = self.repo.get_repo_root(os.getcwd()).split('/')[-2]
@@ -88,3 +90,9 @@ class Objects:
         logger.info('The root tree entry = {}'.format(root_tree_entry))
         self.index.update_index(index_content)
         return root_tree_entry
+
+    def create_commit(self, author, message, root_tree_entry):
+        commit_entry = CommitEntry(message=message, author=author, root_tree_sha1 = root_tree_entry.sha1)
+        commit_blob = CommitBlob(self.repo)
+        commit_hash = commit_blob.create_commit(commit_entry)
+        return commit_hash

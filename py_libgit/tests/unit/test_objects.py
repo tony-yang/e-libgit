@@ -36,7 +36,7 @@ class TestCommitTree(unittest.TestCase):
             path: IndexEntry(path, current_sha1='0'*40, new_sha1=new_sha1)
         }
         self.index.build_tracked_index = MagicMock(return_value=tracked_index)
-        root_tree_entry = self.objects.commit_cached_tree_objects()
+        root_tree_entry = self.objects.create_cached_tree_objects()
 
         tree_content = '{},{},{},{}\n'.format('hello', '10000644', EntryType.BLOB, new_sha1)
         expected_tree_sha = hashlib.sha1(tree_content.encode()).hexdigest()
@@ -50,7 +50,7 @@ class TestCommitTree(unittest.TestCase):
             path: IndexEntry(path, current_sha1='0'*40, new_sha1=hello_sha1)
         }
         self.index.build_tracked_index = MagicMock(return_value=tracked_index)
-        root_tree_entry = self.objects.commit_cached_tree_objects()
+        root_tree_entry = self.objects.create_cached_tree_objects()
 
         tree_content = '{},{},{},{}\n'.format('hello', '10000644', EntryType.BLOB, hello_sha1)
         expected_tree_sha1 = hashlib.sha1(tree_content.encode()).hexdigest()
