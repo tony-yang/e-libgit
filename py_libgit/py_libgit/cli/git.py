@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 import argparse
 from py_libgit.api.add import Add
+from py_libgit.api.commit import Commit
 from py_libgit.api.init import Init
 from py_libgit.api.tree import Tree
 
@@ -20,6 +21,8 @@ def main():
     add_parser.add_argument('pathname', help='The files or directoies to be added')
 
     commit_parser = subparsers.add_parser('commit', help='Commit staging changes to the repository')
+    commit_parser.add_argument('--author', default='NO AUTHOR', help='Specify an explicit author name')
+    commit_parser.add_argument('-m', '--message', required=True, help='Use the given message as the commit message')
 
     args = parser.parse_args()
     if 'init' == args.subparser_name:
@@ -33,7 +36,9 @@ def main():
     elif 'commit' == args.subparser_name:
         logger.info('Called with commit')
         tree = Tree()
-        tree.create_tree()
+        root_tree_entry = tree.create_tree()
+        commit = Commit()
+        commit.create_commit(author=args.author, commit_message=args.message, root_tree_entry=root_tree_entry)
     else:
         parser.print_help()
 

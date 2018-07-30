@@ -91,8 +91,8 @@ class Objects:
         self.index.update_index(index_content)
         return root_tree_entry
 
-    def create_commit(self, author, message, root_tree_entry):
-        commit_entry = CommitEntry(message=message, author=author, root_tree_sha1 = root_tree_entry.sha1)
+    def create_commit(self, author, message, root_tree_entry, current_head_sha1=[]):
+        commit_entry = CommitEntry(message=message, author=author, root_tree_sha1 = root_tree_entry.sha1, parents_sha1=current_head_sha1)
         commit_blob = CommitBlob(self.repo)
         commit_hash = commit_blob.create_commit(commit_entry)
         return commit_hash

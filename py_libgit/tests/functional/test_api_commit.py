@@ -1,6 +1,7 @@
 import unittest
+from unittest.mock import MagicMock
 
-import hashlib, os, shutil
+import hashlib, os, shutil, time
 from py_libgit.api.add import Add
 from py_libgit.api.commit import Commit
 from py_libgit.api.init import Init
@@ -37,10 +38,16 @@ class TestCommit(unittest.TestCase):
 
     def test_create_commit_successfully(self):
         author = 'name author'
+        mock_timestamp = 1532961836
         message = 'test commit message for hello world'
+        parents = ['0' * 40]
 
+        original_time = time.time
+        time.time = MagicMock(return_value=mock_timestamp)
         commit_hash = self.commit.create_commit(author=author, commit_message=message, root_tree_entry=self.tree_entry)
-        expected_commit_entry = 'tree: 6a98fd9cb9c98a860866e8a309f51c0686baa3e8\nparents: []\nauthor: name author\nmessage: test commit message for hello world'
+        time.time = original_time
+
+        expected_commit_entry = 'tree: 6a98fd9cb9c98a860866e8a309f51c0686baa3e8\nparents: {}\nauthor: {} <NO EMAIL> {} +0000\nmessage: {}\n'.format(parents, author, mock_timestamp, message)
         expected_commit_sha1 = hashlib.sha1(expected_commit_entry.encode()).hexdigest()
         self.assertEqual(commit_hash, expected_commit_sha1, 'Incorrect commit hash when create the commit')
 

@@ -2,6 +2,7 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import hashlib, os
+from py_libgit.core.exceptions import BlobHashConflictError
 
 class TreeBlob:
     def __init__(self, repo, entries):
@@ -42,5 +43,10 @@ class TreeBlob:
     def create_tree(self):
         logger.info('Create a new tree')
         tree_hash = self.create_hash(self.entries)
-        self.store_tree_blob(tree_hash, self.entries)
+        try:
+            self.store_tree_blob(tree_hash, self.entries)
+        except BlobHashConflictError:
+            # In this case, we treat it as the same content
+            # Do nothing and continue
+            pass
         return tree_hash

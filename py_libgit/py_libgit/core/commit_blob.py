@@ -2,6 +2,7 @@ import logging, py_libgit.settings
 logger = logging.getLogger(__name__)
 
 import hashlib, os
+from py_libgit.core.exceptions import BlobHashConflictError
 from py_libgit.core.commit_entry import CommitEntry
 
 class CommitBlob:
@@ -10,10 +11,12 @@ class CommitBlob:
         self.repo = repo
 
     def create_hash(self, commit_entry):
-        content_str = 'tree: {}\nparents: {}\nauthor: {}\nmessage: {}'.format(
+        content_str = 'tree: {}\nparents: {}\nauthor: {} <{}> {} +0000\nmessage: {}\n'.format(
             commit_entry.root_tree_sha1,
             commit_entry.parents_sha1,
             commit_entry.author,
+            commit_entry.email,
+            commit_entry.timestamp,
             commit_entry.message
         )
         logger.info('Commit entry = {}'.format(content_str))
@@ -45,5 +48,10 @@ class CommitBlob:
     def create_commit(self, commit_entry):
         logger.info('Create a new commit message')
         commit_hash = self.create_hash(commit_entry)
-        self.store_commit_blob(commit_hash, commit_entry)
+        try:
+            self.store_commit_blob(commit_hash, commit_entry)
+        except BlobHashConflictError:
+            # In this case, we treat it as the same content
+            # Do nothing and continue
+            pass
         return commit_hash

@@ -22,3 +22,22 @@ class HeadRef:
 
         with open(head_file, 'w') as f:
             f.write('ref: refs/heads/master')
+
+    def update_head_ref(self, repo, sha1):
+        repo_root = repo.get_repo_root(os.getcwd())
+        head_file = os.path.join(repo_root, 'HEAD')
+        with open(head_file, 'w') as f:
+            f.write(sha1)
+
+    def get_current_head_sha1(self, repo):
+        repo_root = repo.get_repo_root(os.getcwd())
+        head_file = os.path.join(repo_root, 'HEAD')
+
+        sha1 = '0' * 40
+        with open(head_file, 'r') as f:
+            content = f.read()
+
+        if content != 'ref: refs/heads/master':
+            sha1 = content
+
+        return sha1

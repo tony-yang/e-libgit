@@ -69,4 +69,7 @@ class Repo:
         return self.objects.create_cached_tree_objects()
 
     def create_commit(self, author, message, root_tree_entry):
-        return self.objects.create_commit(author, message, root_tree_entry)
+        current_head_sha1 = [self.head_ref.get_current_head_sha1(self)]
+        new_commit_sha1 = self.objects.create_commit(author, message, root_tree_entry, current_head_sha1)
+        self.head_ref.update_head_ref(self, new_commit_sha1)
+        return new_commit_sha1
